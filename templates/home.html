@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovieVerse - Your Personal Movie Recommendation System</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="icon" href="/static/logo.jpg" type="image/x-icon">
+    <style>
+        body {
+            background: url('/static/background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Arial', sans-serif;
+            color: #ffffff; /* Ensures text remains readable against the background */
+        }
+        .navbar {
+            padding: 1rem 1.5rem; /* Increases navbar height */
+            background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent background */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-brand {
+            font-size: 1.5rem; /* Makes the brand text larger */
+            font-weight: bold; /* Emphasizes the brand name */
+        }
+        .navbar-brand img {
+            max-height: 40px;
+            margin-right: 10px;
+        }
+        .jumbotron {
+            background: rgba(0, 0, 0, 0.7); /* Semi-transparent overlay */
+            color: #ffffff;
+            padding: 3rem;
+            text-align: center;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        .jumbotron h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        .jumbotron p {
+            font-size: 1.25rem;
+        }
+        .btn-custom {
+            background-color: #007bff;
+            color: white;
+            font-size: 1.2rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        .btn-custom:hover {
+            background-color: #0056b3;
+        }
+        .card {
+            border: none;
+            background: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .card-title {
+            font-weight: bold;
+            font-size: 1.25rem;
+            text-align: center;
+            color: #343a40;
+        }
+        .card-text {
+            color: #6c757d;
+            font-size: 1rem;
+        }
+        .liked-movie-item {
+            background: rgba(255, 255, 255, 0.8); /* Light background for visibility */
+            color: #000; /* Black text for better readability */
+            font-weight: bold;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+        
+        /* Search Bar Styling */
+        .search-bar {
+            border-radius: 20px 0 0 20px; /* Rounded corners on the left */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+            height: 45px; /* Consistent height */
+        }
+        
+        .btn-search {
+            background-color: #007bff; /* Match website color */
+            color: #fff;
+            border-radius: 0 20px 20px 0; /* Rounded corners on the right */
+            height: 45px; /* Match search bar height */
+            padding: 0 20px; /* Consistent padding */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+        }
+        
+        .btn-search:hover {
+            background-color: #0056b3; /* Darker shade on hover */
+        }
+        #loading-bar-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        #loading-bar {
+            text-align: center;
+            background: #ffffff;
+            padding: 20px 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        #loading-bar span {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007bff;
+            display: block;
+            margin-top: 10px;
+            animation: blink 1.5s infinite;
+        }
+        @keyframes blink {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+        
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                MovieVerse
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="naive-bayes">Naive Bayes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="decision-tree">Decision Tree</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="knn-clustering">KNN Clustering</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="container mt-5">
+        <div class="jumbotron">
+            <h1>Welcome to MovieVerse</h1>
+            <p>Your ultimate movie recommendation system. Discover movies tailored to your taste, powered by advanced algorithms and analytics.</p>
+        </div>
+    </div>
+
+<!-- Liked Movies Section with Enhanced Visibility -->
+<div class="container mt-5">
+    <!-- Search Bar -->
+    <div class="jumbotron">
+
+        <form method="POST">
+            <div class="input-group mb-3">
+                <input 
+                    type="text" 
+                    name="movie_name" 
+                    class="form-control search-bar" 
+                    placeholder="Search for a movie to like" 
+                    required>
+                <div class="input-group-append">
+                    <button class="btn btn-search" type="submit" name="add_movie">Search</button>
+                </div>
+            </div>
+        </form>
+    
+        <!-- Liked Movies Section -->
+        <h3>Liked Movies</h3>
+        <ul class="list-group mb-3">
+            {% for movie in liked_movies.itertuples() %}
+                <li class="list-group-item d-flex justify-content-between align-items-center liked-movie-item">
+                    {{ movie.title }}
+                    <form method="POST" style="margin: 0;">
+                        <button class="btn btn-danger btn-sm" type="submit" name="delete_movie" value="{{ movie.id }}">
+                            X
+                        </button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    
+        <!-- Loading Bar Container -->
+        <div id="loading-bar-container" style="display: none;">
+            <div id="loading-bar">
+                <span>Processing...</span>
+            </div>
+        </div>
+
+        <!-- Process Data Button -->
+        <form method="POST" action="{{ url_for('process_data') }}" onsubmit="showLoadingBar()">
+            <button 
+                class="btn btn-custom btn-block mt-3"
+                type="submit"
+                {% if liked_movies|length < 4 %} disabled {% endif %}>
+                Process Data
+            </button>
+        </form>
+    </div>
+</div>
+
+    
+
+    <!-- Cards Section -->
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">Naive Bayes</h5>
+                        <p class="card-text flex-grow-1">Naive Bayes uses probability theory to predict which movies you might enjoy based on patterns in your viewing history and preferences.</p>
+                        <a href="naive-bayes" class="btn btn-custom btn-block mt-auto">See Results</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">Decision Tree</h5>
+                        <p class="card-text flex-grow-1">Decision Tree splits your movie choices into meaningful categories, helping identify which factors drive your movie preferences.</p>
+                        <a href="decision-tree" class="btn btn-custom btn-block mt-auto">See Results</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">KNN Clustering</h5>
+                        <p class="card-text flex-grow-1">KNN Clustering groups similar users and recommends movies that people with similar tastes have enjoyed.</p>
+                        <a href="knn-clustering" class="btn btn-custom btn-block mt-auto">See Results</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+
+<script>
+    // Show the loading bar
+    function showLoadingBar() {
+        document.getElementById('loading-bar-container').style.display = 'block';
+    }
+</script>

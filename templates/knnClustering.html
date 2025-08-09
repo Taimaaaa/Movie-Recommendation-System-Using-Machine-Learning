@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovieVerse - KNN Clustering Results</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background: url('/static/background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Arial', sans-serif;
+            color: #ffffff;
+        }
+        .navbar {
+            padding: 1rem 1.5rem;
+            background-color: rgba(0, 0, 0, 0.8);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+    
+        .navbar-brand img {
+            max-height: 60px;
+            margin-right: 10px;
+        }
+    
+        .nav-link {
+            font-size: 1.25rem;
+            margin: 0 10px;
+        }
+        .section-title {
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            text-align: center;
+            width: fit-content;
+            margin: 2rem auto;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        .jumbotron {
+            background: rgba(0, 0, 0, 0.7);
+            color: #ffffff;
+            padding: 3rem;
+            text-align: center;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        .jumbotron h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        .jumbotron p {
+            font-size: 1.25rem;
+        }
+        .movie-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #000;
+            text-align: center;
+        }
+        h1 {
+            color:rgb(0, 0, 0);
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        h3 {
+            color: #495057;
+            margin-bottom: 1rem;
+        }
+        .feature-list li {
+            font-size: 1rem;
+            color: #6c757d;
+        }
+        table {
+            background: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 5px;
+            color: #495057;
+        }
+        .card {
+            border: none;
+            background: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .card-body {
+            padding: 2rem;
+        }
+        .insights p {
+            font-size: 1rem;
+            color: #6c757d;
+        }
+        .list-group-item {
+            color: #495057;
+            background-color: #ffffff;
+            border-color: #dee2e6;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                MovieVerse
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="naive-bayes">Naive Bayes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="decision-tree">Decision Tree</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="knn-clustering">KNN Clustering</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="section-title">
+            Recommended Movies
+        </div>
+        <div class="row">
+            {% for movie in recommendations %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <img src="{{ movie['poster_path'] }}" class="card-img-top" alt="{{ movie['title'] }}">
+                        <div class="card-body">
+                            <h5 class="card-title movie-title">{{ movie['title'] }}</h5>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-body">
+                <h1>KNN Clustering Analysis Results</h1>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3>Performance Metrics</h3>
+                        <ul class="list-group">
+                            <li class="list-group-item">Accuracy: <span class="font-weight-bold">{{ accuracy }}</span></li>
+                            <li class="list-group-item">Precision: <span class="font-weight-bold">{{ precision }}</span></li>
+                            <li class="list-group-item">Recall: <span class="font-weight-bold">{{ recall }}</span></li>
+                            <li class="list-group-item">F1 Score: <span class="font-weight-bold">{{ f1 }}</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <h3 class="mt-4">Confusion Matrix</h3>
+                <table class="table table-bordered text-center">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th></th>
+                            <th>Predicted Not Liked</th>
+                            <th>Predicted Liked</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>Actual Not Liked</th>
+                            <td>{{ conf_matrix[0][0] }}</td>
+                            <td>{{ conf_matrix[0][1] }}</td>
+                        </tr>
+                        <tr>
+                            <th>Actual Liked</th>
+                            <td>{{ conf_matrix[1][0] }}</td>
+                            <td>{{ conf_matrix[1][1] }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
